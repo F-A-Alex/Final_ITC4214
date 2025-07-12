@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Employee Admin Dashboard - Indigo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Employee Admin Dashboard</h2>
+        <div>
+            <span class="badge bg-primary me-2">Staff Member</span>
+            {% if user.is_superuser %}
+                <a href="/admin/" class="btn btn-outline-primary">Super Admin</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_products }}</h4>
+                            <p class="mb-0">Total Products</p>
+                        </div>
+                        <i class="fas fa-box fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ active_products }}</h4>
+                            <p class="mb-0">Active Products</p>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_orders }}</h4>
+                            <p class="mb-0">Total Orders</p>
+                        </div>
+                        <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ active_orders }}</h4>
+                            <p class="mb-0">Active Orders</p>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Orders -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Orders</h5>
+                    <a href="{% url 'employee_admin:orders' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>{{ order.order_number }}</td>
+                                    <td>{{ order.user.get_full_name|default:order.user.username }}</td>
+                                    <td>${{ order.total_amount }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'delivered' %}success{% else %}primary{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No orders yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Products -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Low Stock Alert</h5>
+                    <a href="{% url 'employee_admin:products' %}" class="btn btn-sm btn-primary">Manage</a>
+                </div>
+                <div class="card-body">
+                    {% if low_stock_products %}
+                    {% for product in low_stock_products %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">{{ product.name|truncatechars:20 }}</h6>
+                            <small class="text-muted">{{ product.category.get_name_display }}</small>
+                        </div>
+                        <span class="badge bg-danger">{{ product.stock_quantity }} left</span>
+                    </div>
+                    {% if not forloop.last %}<hr>{% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">All products are well stocked!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'employee_admin:products' %}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-box me-2"></i>Manage Products
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'employee_admin:orders' %}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-shopping-cart me-2"></i>Manage Orders
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'employee_admin:add_product' %}" class="btn btn-outline-success w-100 mb-2">
+                                <i class="fas fa-plus me-2"></i>Add Product
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            {% if user.is_superuser %}
+                                <a href="/admin/" class="btn btn-outline-secondary w-100 mb-2">
+                                    <i class="fas fa-cog me-2"></i>Super Admin
+                                </a>
+                            {% else %}
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary w-100 mb-2">
+                                    <i class="fas fa-user me-2"></i>My Profile
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

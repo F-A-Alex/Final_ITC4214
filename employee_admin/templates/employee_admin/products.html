@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Products - Indigo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Products</h2>
+        <a href="{% url 'employee_admin:add_product' %}" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Add New Product
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ search_query }}" maxlength="100">
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}" {% if current_category == category.name %}selected{% endif %}>
+                            {{ category.get_name_display }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'employee_admin:products' %}" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card">
+        <div class="card-body">
+            {% if products %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Featured</th>
+                            {% if is_superuser %}<th>Created By</th>{% endif %}
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                            </td>
+                            <td>
+                                <strong>{{ product.name }}</strong>
+                                <br><small class="text-muted">{{ product.description|truncatewords:8 }}</small>
+                            </td>
+                            <td>{{ product.category.get_name_display }}</td>
+                            <td>${{ product.price }}</td>
+                            <td>
+                                <span class="badge bg-{% if product.stock_quantity > 5 %}success{% elif product.stock_quantity > 0 %}warning{% else %}danger{% endif %}">
+                                    {{ product.stock_quantity }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if product.is_active %}success{% else %}secondary{% endif %}">
+                                    {% if product.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if product.featured %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            </td>
+                            {% if is_superuser %}
+                            <td>
+                                {% if product.created_by %}
+                                    {{ product.created_by.username }}
+                                {% else %}
+                                    <span class="text-muted">System</span>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'store:product_detail' product.pk %}" class="btn btn-outline-primary" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'employee_admin:edit_product' product.pk %}" class="btn btn-outline-secondary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if is_superuser or product.created_by == user %}
+                                    <a href="{% url 'employee_admin:delete_product' product.pk %}" class="btn btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                <h4>No products found</h4>
+                <p class="text-muted">Try adjusting your search or filter criteria.</p>
+                <a href="{% url 'employee_admin:products' %}" class="btn btn-primary">View All Products</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

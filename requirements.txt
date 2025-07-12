@@ -1,0 +1,10 @@
+Pillow
+Django
+crispy-forms
+
+
+Users:
+
+admin:admin
+customer:Password56pass
+addy:Password#56

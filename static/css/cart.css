@@ -1,0 +1,45 @@
+/* Cart App Specific Styles */
+
+/* Quantity Input */
+.quantity-input {
+    width: 80px !important;
+    min-width: 80px !important;
+    font-size: 16px !important;
+    padding: 8px !important;
+}
+
+/* Cart Popup */
+.cart-popup {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Cart Items */
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+/* Responsive Cart */
+@media (max-width: 768px) {
+    .cart-item-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .quantity-input {
+        width: 60px !important;
+        min-width: 60px !important;
+    }
+}

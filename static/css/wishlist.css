@@ -1,0 +1,32 @@
+/* Wishlist App Specific Styles */
+
+/* Wishlist Cards */
+.wishlist-card {
+    transition: all 0.3s ease;
+}
+
+.wishlist-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.wishlist-card .card-img-top {
+    height: 250px;
+    object-fit: cover;
+}
+
+/* Wishlist Button States */
+.wishlist-btn .fa-heart {
+    transition: all 0.3s ease;
+}
+
+.wishlist-btn:hover .fa-heart {
+    transform: scale(1.1);
+}
+
+/* Responsive Wishlist */
+@media (max-width: 768px) {
+    .wishlist-card .card-img-top {
+        height: 200px;
+    }
+}

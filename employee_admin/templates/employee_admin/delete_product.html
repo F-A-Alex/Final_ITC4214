@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Product - Employee Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Product
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail mb-3" style="max-width: 200px;">
+                        {% endif %}
+                        <h4>{{ product.name }}</h4>
+                        <p class="text-muted">{{ product.category.get_name_display }} • ${{ product.price }}</p>
+                    </div>
+                    
+                    <div class="border border-danger rounded p-4 mb-4 bg-light">
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong> PERMANENT ACTION WARNING </strong>
+                        </div>
+                        <br>
+                        <p class="mb-2">This action <strong>CANNOT BE UNDONE</strong>. Deleting this product will:</p>
+                        <ul class="mb-3">
+                            <li>Remove it from all customer carts and wishlists</li>
+                            <li>Make it unavailable for purchase</li>
+                            <li>Permanently delete all product data</li>
+                            <li><strong>Delete the product image from the server</strong></li>
+                        </ul>
+                        <p class="mb-0"><strong>Please confirm you want to proceed with this permanent deletion.</strong></p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Yes, Delete Product
+                            </button>
+                            <a href="{% url 'employee_admin:products' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

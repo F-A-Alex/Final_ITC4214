@@ -1,0 +1,110 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="{% url 'store:home' %}">
+        <img src="{% static 'logo.png' %}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
+            Indigo
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'store:home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'store:product_list' %}">Products</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Categories
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=pottery">Pottery</a></li>
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=wood">Wood Items</a></li>
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=jewelry">Jewelry</a></li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <!-- Search Form - Desktop only -->
+            <form class="d-flex me-3 d-none d-lg-flex" method="GET" action="{% url 'store:product_list' %}" id="searchForm">
+                <input class="form-control me-2" type="search" name="search" placeholder="Search products..." value="{{ search_query }}" maxlength="100">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+            
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'employee_admin:dashboard' %}">
+                                <i class="fas fa-cog me-1"></i>Admin
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/">
+                                <i class="fas fa-shield-alt me-1"></i>Super Admin
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard:user' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'wishlist:view' %}">
+                            <i class="fas fa-heart me-1"></i>Wishlist
+                            {% if wishlist_count > 0 %}
+                                <span class="badge bg-danger">{{ wishlist_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cart:view' %}">
+                            <i class="fas fa-shopping-cart me-1"></i>Cart
+                            {% if cart_count > 0 %}
+                                <span class="badge bg-danger rounded-pill">{{ cart_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>{{ user.username|truncatechars:15 }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
+                    </li>
+                    
+                    <!-- Search Form - Mobile only (after register) -->
+                    <li class="nav-item d-lg-none">
+                        <form class="d-flex px-3 py-2" method="GET" action="{% url 'store:product_list' %}" id="mobileSearchForm">
+                            <input class="form-control me-2" type="search" name="search" placeholder="Search products..." value="{{ search_query }}" maxlength="100">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

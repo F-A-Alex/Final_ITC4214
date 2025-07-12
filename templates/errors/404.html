@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - Indigo{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <i class="fas fa-exclamation-triangle fa-5x text-warning mb-4"></i>
+            <h1 class="display-4">404</h1>
+            <h2 class="mb-4">Page Not Found</h2>
+            <p class="lead mb-4">Sorry, the page you are looking for doesn't exist or has been moved.</p>
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'store:home' %}" class="btn btn-primary">Go Home</a>
+                <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary">Browse Products</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

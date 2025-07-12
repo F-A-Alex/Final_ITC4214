@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - Indigo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                    <h5>{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-sm">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Personal Information</h6>
+                            <p><strong>First Name:</strong> {{ user.first_name|default:"Not provided" }}</p>
+                            <p><strong>Last Name:</strong> {{ user.last_name|default:"Not provided" }}</p>
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Date of Birth:</strong> {{ user.profile.date_of_birth|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Contact Information</h6>
+                            <p><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not provided" }}</p>
+                            <p><strong>Address:</strong> {{ user.profile.address|default:"Not provided" }}</p>
+                            <p><strong>City:</strong> {{ user.profile.city|default:"Not provided" }}</p>
+                            <p><strong>Postal Code:</strong> {{ user.profile.postal_code|default:"Not provided" }}</p>
+                            <p><strong>Country:</strong> {{ user.profile.country|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="{% url 'cart:view' %}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-shopping-cart me-2"></i>View Cart
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'wishlist:view' %}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-heart me-2"></i>View Wishlist
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-shopping-bag me-2"></i>Shop Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CustomUserCreationForm, ProfileForm, UserUpdateForm
 
+
+#Registration view - shows only the user form - user model and redirects to home after succesful registration - already logged in
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -12,7 +14,7 @@ def register(request):
                 user = form.save()
                 login(request, user)
                 username = form.cleaned_data.get('username')
-                messages.success(request, f'Welcome {username}! Your account has been created.')
+                messages.success(request, f'Welcome {username}! Your account has been created.') #popup to verify account created
                 return redirect('store:home')
             except Exception:
                 messages.error(request, 'Unable to create account. Please try again.')
@@ -20,6 +22,7 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'accounts/register.html', {'form': form})
 
+#Logout and clear cache - redirect to home page
 def logout_view(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
@@ -30,6 +33,9 @@ def logout_view(request):
     response['Expires'] = '0'
     return response
 
+
+#Logged in users only can see their profile or edit
+
 @login_required
 def profile(request):
     return render(request, 'accounts/profile.html')
@@ -37,6 +43,7 @@ def profile(request):
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
+        #Two forms because some fields are in the default user model and some in the profile model 
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = ProfileForm(request.POST, instance=request.user.profile)
         

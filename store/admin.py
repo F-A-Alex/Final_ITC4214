@@ -1,21 +1,30 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem
+from .models import Category, Subcategory, Product, Order, OrderItem
+
+
+#Functions for /admin panel
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'created_at']
     search_fields = ['name']
 
+@admin.register(Subcategory)
+class SubcategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'category', 'created_at']
+    list_filter = ['category']
+    search_fields = ['name']
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'price', 'stock_quantity', 'is_active', 'featured', 'created_by', 'created_at']
-    list_filter = ['category', 'is_active', 'featured', 'created_by', 'created_at']
+    list_display = ['name', 'category', 'subcategory', 'price', 'stock_quantity', 'is_active', 'featured', 'created_by', 'created_at']
+    list_filter = ['category', 'subcategory', 'is_active', 'featured', 'created_by', 'created_at']
     search_fields = ['name', 'description']
     list_editable = ['price', 'stock_quantity', 'is_active', 'featured']
     readonly_fields = ['created_at', 'updated_at']
     
     def save_model(self, request, obj, form, change):
-        if not change:  # Only set created_by for new objects - to handle employee not able to delete other employee items
+        if not change:  
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
     

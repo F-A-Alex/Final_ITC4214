@@ -11,10 +11,12 @@
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold mb-4">Handcrafted with Love</h1>
                 <p class="lead mb-4">Discover unique pottery, wood items, and jewelry made by skilled artisans. Each piece tells a story of craftsmanship and creativity.</p>
-                <a href="{% url 'store:product_list' %}" class="btn btn-light btn-lg">Shop Now</a>
+                <div class="position-relative mb-4">
+                    <a href="{% url 'store:product_list' %}" class="btn btn-light btn-lg">Shop Now</a>
+                </div>
             </div>
             <div class="col-lg-6">
-                <img src="/media/board-361516_1280.jpg" alt="Handmade pottery" class="img-fluid rounded shadow">
+                <img src="/media/static/home1.jpg" alt="Handmade decorations" class="img-fluid rounded shadow">
             </div>
         </div>
     </div>
@@ -24,33 +26,23 @@
 <section class="py-5">
     <div class="container">
         <h2 class="text-center mb-5">Shop by Category</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4 col-md-6">
                 <div class="card category-card h-100 border-0 shadow-sm">
-                    <img src="/media/board-361516_1280.jpg" class="card-img-top" alt="Pottery">
+                    <img src="/media/static/decorations.jpg" class="card-img-top" alt="Decorations">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Pottery</h5>
-                        <p class="card-text">Beautiful handmade ceramic pieces for your home.</p>
-                        <a href="{% url 'store:product_list' %}?category=pottery" class="btn btn-primary">View Pottery</a>
+                        <h5 class="card-title">Decorations</h5>
+                        <p class="card-text">Beautiful handmade pottery and wood items for your home.</p>
+                        <a href="{% url 'store:product_list' %}?category=decorations" class="btn btn-primary">View Decorations</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-4 col-md-6">
                 <div class="card category-card h-100 border-0 shadow-sm">
-                    <img src="/media/board-361516_1280.jpg" class="card-img-top" alt="Wood Items">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Wood Items</h5>
-                        <p class="card-text">Crafted wooden furniture and decorative pieces.</p>
-                        <a href="{% url 'store:product_list' %}?category=wood" class="btn btn-primary">View Wood Items</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card category-card h-100 border-0 shadow-sm">
-                    <img src="/media/board-361516_1280.jpg" class="card-img-top" alt="Jewelry">
+                    <img src="/media/static/jewelry.jpg" class="card-img-top" alt="Jewelry">
                     <div class="card-body text-center">
                         <h5 class="card-title">Jewelry</h5>
-                        <p class="card-text">Unique handcrafted jewelry pieces.</p>
+                        <p class="card-text">Unique handcrafted necklaces and earrings.</p>
                         <a href="{% url 'store:product_list' %}?category=jewelry" class="btn btn-primary">View Jewelry</a>
                     </div>
                 </div>
@@ -89,14 +81,14 @@
 <section class="py-5">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6">
-                <img src="/media/board-361516_1280.jpg" alt="Artisan at work" class="img-fluid rounded shadow">
+            <div class="col-lg-6 mb-2">
+                <img src="/media/static/home2.jpg" alt="Handmaking wooden decorations" class="img-fluid rounded shadow">
             </div>
             <div class="col-lg-6">
                 <h2 class="mb-4">Our Story</h2>
                 <p class="lead">At Indigo, we believe in the beauty of handmade crafts. Our artisans pour their heart and soul into every piece, creating unique items that bring warmth and character to your home.</p>
                 <p>From delicate pottery to sturdy wooden furniture and elegant jewelry, each item in our collection is carefully crafted using traditional techniques passed down through generations.</p>
-                <a href="#" class="btn btn-outline-primary">Learn More</a>
+                <a href="{% url 'store:about' %}" class="btn btn-outline-primary">Learn More</a>
             </div>
         </div>
     </div>

@@ -27,6 +27,7 @@ urlpatterns = [
     path('', include('wishlist.urls')),
     path('', include('dashboard.urls')),
     path('', include('employee_admin.urls')),
+    path('', include('reviews.urls')),
 ]
 
 if settings.DEBUG:

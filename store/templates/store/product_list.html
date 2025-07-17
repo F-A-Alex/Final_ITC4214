@@ -13,21 +13,70 @@
                     <h5 class="mb-0">Filters</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Categories -->
-                    <h6>Categories</h6>
-                    <div class="list-group list-group-flush mb-3">
-                        <a href="{% url 'store:product_list' %}" class="list-group-item list-group-item-action 
-                        {% if not current_category %}active{% endif %}">
-                            All Products
-                        </a>
-                        {% for category in categories %}
-                        <a href="{% url 'store:product_list' %}?category={{ category.name }}" 
-                           class="list-group-item list-group-item-action 
-                           {% if current_category == category.name %}active{% endif %}">
-                            {{ category.get_name_display }}
-                        </a>
-                        {% endfor %}
-                    </div>
+                    <form method="GET" id="filterForm">
+                        <!-- Preserve search query -->
+                        {% if search_query %}
+                            <input type="hidden" name="search" value="{{ search_query }}">
+                        {% endif %}
+                        
+                        <!-- Categories -->
+                        <h6>Categories</h6>
+                        <div class="list-group list-group-flush mb-3">
+                            <!-- All Products -->
+                            <a href="{% url 'store:product_list' %}" class="list-group-item list-group-item-action 
+                            {% if not current_category %}active{% endif %}">
+                                All Products
+                            </a>
+
+                            {% for category in categories %}
+                                <!-- Main Category -->
+                                <a href="{% url 'store:product_list' %}?category={{ category.name }}" 
+                                class="list-group-item list-group-item-action 
+                                {% if current_category == category.name and not current_subcategory %}active{% endif %}">
+                                    {{ category.get_name_display }}
+                                </a>
+
+                                <!-- Subcategories -->
+                                <div class="ms-3 my-2">
+                                    {% for subcategory in category.subcategories.all %}
+                                        <a href="{% url 'store:product_list' %}?category={{ category.name }}&subcategory={{ subcategory.name }}" 
+                                        class="list-group-item list-group-item-action 
+                                        {% if current_category == category.name and current_subcategory == subcategory.name %}active{% endif %}">
+                                            {{ subcategory.get_name_display }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        
+                        <!-- Price Range -->
+                        <h6>Price Range</h6>
+                        <div class="mb-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" name="min_price" class="form-control form-control-sm" 
+                                           placeholder="Min $" value="{{ min_price }}" min="0" step="1">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="max_price" class="form-control form-control-sm" 
+                                           placeholder="Max $" value="{{ max_price }}" min="0" step="1">
+                                </div>
+                            </div>
+                            <small class="text-muted">Range: ${{ price_range.min_price }} - ${{ price_range.max_price }}</small>
+                        </div>
+                        
+                        <!-- Preserve current filters -->
+                        {% if current_category %}
+                            <input type="hidden" name="category" value="{{ current_category }}">
+                        {% endif %}
+                        {% if current_subcategory %}
+                            <input type="hidden" name="subcategory" value="{{ current_subcategory }}">
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">Apply Filters</button>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-outline-secondary btn-sm w-100">Clear All</a>
+                    </form>
                 </div>
             </div>
         </div>
@@ -36,8 +85,14 @@
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>
-                    {% if current_category %}
-                        {{ current_category|title }} Products
+                    {% if current_subcategory %}
+                        {% for subcategory in current_category_obj.subcategories.all %}
+                            {% if subcategory.name == current_subcategory %}
+                                {{ subcategory.get_name_display }} Products
+                            {% endif %}
+                        {% endfor %}
+                    {% elif current_category %}
+                        {{ current_category_obj.get_name_display }} Products
                     {% elif search_query %}
                         Search Results for "{{ search_query }}"
                     {% else %}
@@ -55,6 +110,7 @@
                         <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted small">{{ product.subcategory.get_name_display }}</p>
                             <p class="card-text flex-grow-1">{{ product.description|truncatewords:15 }}</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="h5 text-primary mb-0">${{ product.price }}</span>
@@ -70,11 +126,7 @@
                                     </button>
                                     {% endif %}
                                     <a href="{% url 'wishlist:add' product.id %}" class="btn btn-outline-danger btn-sm wishlist-btn" title="Add to Wishlist">
-                                        {% if product in user.wishlist.products.all %}
-                                        <i class="fas fa-heart text-danger"></i>
-                                        {% else %}
                                         <i class="far fa-heart"></i>
-                                        {% endif %}
                                     </a>
                                 </div>
                                 {% endif %}

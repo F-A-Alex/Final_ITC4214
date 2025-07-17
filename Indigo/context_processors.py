@@ -1,8 +1,8 @@
 from cart.models import Cart
 from wishlist.models import Wishlist
 
+#Add cart item count to template context so can access in any template
 def cart_count(request):
-    """Add cart item count to template context"""
     if request.user.is_authenticated:
         try:
             cart = Cart.objects.get(user=request.user)
@@ -11,8 +11,8 @@ def cart_count(request):
             return {'cart_count': 0}
     return {'cart_count': 0}
 
+#Add wishlist item count to template context
 def wishlist_count(request):
-    """Add wishlist item count to template context"""
     if request.user.is_authenticated:
         try:
             wishlist = Wishlist.objects.get(user=request.user)

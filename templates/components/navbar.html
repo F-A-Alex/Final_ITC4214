@@ -3,7 +3,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
     <div class="container">
         <a class="navbar-brand fw-bold text-primary" href="{% url 'store:home' %}">
-        <img src="{% static 'logo.png' %}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
             Indigo
         </a>
         
@@ -19,19 +18,28 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'store:product_list' %}">Products</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'store:about' %}">About</a>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         Categories
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=pottery">Pottery</a></li>
-                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=wood">Wood Items</a></li>
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=decorations">Decorations</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=decorations&subcategory=pottery">Pottery</a></li>
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=decorations&subcategory=wood">Wood Items</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=jewelry">Jewelry</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=jewelry&subcategory=necklaces">Necklaces</a></li>
+                        <li><a class="dropdown-item" href="{% url 'store:product_list' %}?category=jewelry&subcategory=earrings">Earrings</a></li>
                     </ul>
                 </li>
             </ul>
             
-            <!-- Search Form - Desktop only -->
+            <!-- Search Form - Large screens only -->
             <form class="d-flex me-3 d-none d-lg-flex" method="GET" action="{% url 'store:product_list' %}" id="searchForm">
                 <input class="form-control me-2" type="search" name="search" placeholder="Search products..." value="{{ search_query }}" maxlength="100">
                 <button class="btn btn-outline-primary" type="submit">

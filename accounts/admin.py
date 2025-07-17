@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from .models import Profile
 
-# Unregister the default User admin first
+# Unregister the default User admin first so we can add extra fields
 admin.site.unregister(User)
 
 # Custom User admin with staff management

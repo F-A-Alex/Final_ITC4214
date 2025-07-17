@@ -29,6 +29,18 @@
                         {% endfor %}
                     </select>
                 </div>
+                <div class="col-md-3">
+                    <select name="subcategory" class="form-select">
+                        <option value="">All Subcategories</option>
+                        {% for category in categories %}
+                            {% for subcategory in category.subcategories.all %}
+                            <option value="{{ subcategory.name }}" {% if current_subcategory == subcategory.name %}selected{% endif %}>
+                                {{ subcategory.get_name_display }}
+                            </option>
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">Filter</button>
                 </div>
@@ -50,6 +62,7 @@
                             <th>Image</th>
                             <th>Name</th>
                             <th>Category</th>
+                            <th>Subcategory</th>
                             <th>Price</th>
                             <th>Stock</th>
                             <th>Status</th>
@@ -69,6 +82,7 @@
                                 <br><small class="text-muted">{{ product.description|truncatewords:8 }}</small>
                             </td>
                             <td>{{ product.category.get_name_display }}</td>
+                            <td>{{ product.subcategory.get_name_display }}</td>
                             <td>${{ product.price }}</td>
                             <td>
                                 <span class="badge bg-{% if product.stock_quantity > 5 %}success{% elif product.stock_quantity > 0 %}warning{% else %}danger{% endif %}">

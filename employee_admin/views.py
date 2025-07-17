@@ -4,15 +4,12 @@ from django.http import HttpResponseForbidden
 from django.template import TemplateDoesNotExist
 from django.db.models import Q
 import os
-from store.models import Product, Category, Order
+from store.models import Product, Category, Subcategory, Order
 from .forms import ProductForm, OrderForm
 from functools import wraps
 
-def is_staff_user(user):
-    return user.is_authenticated and user.is_staff
-    
+#Check if staff and generate custom error message
 def staff_required(view_func):
-    """Custom decorator that returns 403 Forbidden instead of redirecting to login"""
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -22,27 +19,29 @@ def staff_required(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
+#Check render the custom 403 page with specific error message
 def render_403(request, message="Access Denied"):
-    """Render custom 403 template with error message"""
     try:
         return render(request, 'errors/403.html', {
             'error_message': message
         }, status=403)
     except TemplateDoesNotExist:
-        # Fallback to simple HttpResponseForbidden if template doesn't exist
         return HttpResponseForbidden(message)
-  
+
+
+#Admin dashboard
 @staff_required
 def admin_dashboard(request):
     try:
-        # All staff can see all products
+        #Get statistics on active products - stock level 
         total_products = Product.objects.count()
         active_products = Product.objects.filter(is_active=True).count()
         low_stock_products = Product.objects.filter(
             stock_quantity__lt=5, 
             is_active=True
-        ).select_related('category')
+        ).select_related('category', 'subcategory')
         
+        #Get statistics on orders and status
         total_orders = Order.objects.count()
         active_orders = Order.objects.exclude(status__in=['delivered', 'cancelled']).count()
         recent_orders = Order.objects.select_related('user').all()[:5]
@@ -55,6 +54,7 @@ def admin_dashboard(request):
             'recent_orders': recent_orders,
             'low_stock_products': low_stock_products,
         })
+    #fallbck if error
     except Exception:
         return render(request, 'employee_admin/dashboard.html', {
             'total_products': 0,
@@ -65,11 +65,13 @@ def admin_dashboard(request):
             'low_stock_products': [],
         })
 
+
+#Admin Products Database Page
 @staff_required
 def admin_products(request):
     try:
-        # All staff can see all products
-        products = Product.objects.select_related('category', 'created_by').order_by('-created_at')
+        products = Product.objects.select_related('category', 'subcategory', 'created_by').order_by('-created_at')
+        categories = Category.objects.all().prefetch_related('subcategories')
         
         # Search functionality
         search_query = request.GET.get('search', '').strip()
@@ -79,19 +81,25 @@ def admin_products(request):
                 Q(description__icontains=search_query)
             )
         
-        # Filter by category with validation
+        # Filter by category
         category = request.GET.get('category', '').strip()
         if category:
             valid_categories = [choice[0] for choice in Category.CATEGORY_CHOICES]
             if category in valid_categories:
                 products = products.filter(category__name=category)
         
-        categories = Category.objects.all()
+        # Filter by subcategory
+        subcategory = request.GET.get('subcategory', '').strip()
+        if subcategory:
+            valid_subcategories = [choice[0] for choice in Subcategory.SUBCATEGORY_CHOICES]
+            if subcategory in valid_subcategories:
+                products = products.filter(subcategory__name=subcategory)
         
         return render(request, 'employee_admin/products.html', {
             'products': products,
             'categories': categories,
             'current_category': category,
+            'current_subcategory': subcategory,
             'search_query': search_query,
             'is_superuser': request.user.is_superuser
         })
@@ -100,16 +108,19 @@ def admin_products(request):
             'products': [],
             'categories': [],
             'current_category': '',
+            'current_subcategory': '',
             'search_query': '',
             'is_superuser': False
         })
 
+
+#Admin Orders page
 @staff_required
 def admin_orders(request):
     try:
         orders = Order.objects.select_related('user').order_by('-created_at')
         
-        # Filter by status with validation
+        # Filter by status
         status = request.GET.get('status', '').strip()
         if status:
             valid_statuses = [choice[0] for choice in Order.STATUS_CHOICES]
@@ -128,6 +139,8 @@ def admin_orders(request):
             'status_choices': []
         })
 
+
+#Admin add product to database function and relevant error messages
 @staff_required
 def add_product(request):
     if request.method == 'POST':
@@ -146,13 +159,13 @@ def add_product(request):
     
     return render(request, 'employee_admin/add_product.html', {'form': form})
 
+
+#Admin edit product function and relevant error messages
 @staff_required
 def edit_product(request, pk):
     try:
         pk = int(pk)
         product = get_object_or_404(Product, pk=pk)
-        
-        # All staff members can edit any product
         
         if request.method == 'POST':
             form = ProductForm(request.POST, request.FILES, instance=product)
@@ -174,10 +187,13 @@ def edit_product(request, pk):
         messages.error(request, 'Invalid product ID.')
         return redirect('employee_admin:products')
 
+
+#Admin delete product function and relevant error messages
 @staff_required
 def delete_product(request, pk):
     try:
-        pk = int(pk)
+        #Delete a product by pk
+        pk = int(pk) 
         product = get_object_or_404(Product, pk=pk)
         
         # Only allow deletion if user is superuser or created the product
@@ -188,8 +204,8 @@ def delete_product(request, pk):
         if request.method == 'POST':
             try:
                 product_name = product.name
-                # Delete the image file if it exists and is not the default
-                if product.image and product.image.name != 'products/default.jpg':
+                # Delete the image file if product has one
+                if product.image:
                     image_path = product.image.path
                     if os.path.exists(image_path):
                         os.remove(image_path)
@@ -199,11 +215,14 @@ def delete_product(request, pk):
                 messages.error(request, 'Unable to delete product. Please try again.')
             return redirect('employee_admin:products')
         
+        # render confirmation page
         return render(request, 'employee_admin/delete_product.html', {'product': product})
     except (ValueError, TypeError):
         messages.error(request, 'Invalid product ID.')
         return redirect('employee_admin:products')
 
+
+#Edit order by pk
 @staff_required
 def edit_order(request, pk):
     try:

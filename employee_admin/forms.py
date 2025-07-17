@@ -1,11 +1,12 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from store.models import Product, Order
+from store.models import Product, Subcategory, Order
 
+# Form for creating and updating products
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'category', 'image', 'stock_quantity', 'is_active', 'featured']
+        fields = ['name', 'description', 'price', 'category', 'subcategory', 'image', 'stock_quantity', 'is_active', 'featured']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'price': forms.NumberInput(attrs={'step': '0.01', 'min': '0.01'}),
@@ -19,21 +20,27 @@ class ProductForm(forms.ModelForm):
         self.fields['description'].widget.attrs.update({'class': 'form-control'})
         self.fields['price'].widget.attrs.update({'class': 'form-control'})
         self.fields['category'].widget.attrs.update({'class': 'form-select'})
+        self.fields['subcategory'].widget.attrs.update({'class': 'form-select'})
         self.fields['image'].widget.attrs.update({'class': 'form-control'})
         self.fields['stock_quantity'].widget.attrs.update({'class': 'form-control'})
         self.fields['is_active'].widget.attrs.update({'class': 'form-check-input'})
         self.fields['featured'].widget.attrs.update({'class': 'form-check-input'})
+        
+        # Filter subcategories based on category if editing existing product else show all
+        if self.instance and self.instance.pk and self.instance.category:
+            self.fields['subcategory'].queryset = Subcategory.objects.filter(category=self.instance.category)
+        else:
+            self.fields['subcategory'].queryset = Subcategory.objects.all()
     
     def clean_image(self):
         image = self.cleaned_data.get('image')
+        #check for file size or default to 0 so there is no error
         if image:
-            # Handle both file objects and strings
             if hasattr(image, 'size'):
                 file_size = image.size
             elif hasattr(image, 'file') and hasattr(image.file, 'size'):
                 file_size = image.file.size
             else:
-                # If we can't determine size, skip size check
                 file_size = 0
             
             # Check file size (5MB limit)
@@ -48,15 +55,15 @@ class ProductForm(forms.ModelForm):
         
         return image
 
+# Form for orders
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['status', 'shipping_address']
+        fields = ['status']
         widgets = {
-            'shipping_address': forms.Textarea(attrs={'rows': 4}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['status'].widget.attrs.update({'class': 'form-select'})
-        self.fields['shipping_address'].widget.attrs.update({'class': 'form-control'})

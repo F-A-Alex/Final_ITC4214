@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ob(t3a!fegkt2no4j)-h4b91=!un0@qn5#z1z6t@bq$k7l7v%l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'wishlist',
     'dashboard',
     'employee_admin',
+    'reviews',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

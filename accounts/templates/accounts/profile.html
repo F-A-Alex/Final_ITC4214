@@ -5,63 +5,138 @@
 
 {% block content %}
 <div class="container py-4">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
-                    <h5>{{ user.get_full_name|default:user.username }}</h5>
-                    <p class="text-muted">{{ user.email }}</p>
-                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-sm">Edit Profile</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-9">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Profile Information</h5>
-                </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Profile Header -->
+            <div class="card mb-4">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Personal Information</h6>
-                            <p><strong>First Name:</strong> {{ user.first_name|default:"Not provided" }}</p>
-                            <p><strong>Last Name:</strong> {{ user.last_name|default:"Not provided" }}</p>
-                            <p><strong>Username:</strong> {{ user.username }}</p>
-                            <p><strong>Email:</strong> {{ user.email }}</p>
-                            <p><strong>Date of Birth:</strong> {{ user.profile.date_of_birth|default:"Not provided" }}</p>
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            <i class="fas fa-user-circle fa-4x text-primary mb-2"></i>
                         </div>
                         <div class="col-md-6">
-                            <h6>Contact Information</h6>
-                            <p><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not provided" }}</p>
-                            <p><strong>Address:</strong> {{ user.profile.address|default:"Not provided" }}</p>
-                            <p><strong>City:</strong> {{ user.profile.city|default:"Not provided" }}</p>
-                            <p><strong>Postal Code:</strong> {{ user.profile.postal_code|default:"Not provided" }}</p>
-                            <p><strong>Country:</strong> {{ user.profile.country|default:"Not provided" }}</p>
+                            <h3 class="mb-1">{{ user.get_full_name|default:user.username }}</h3>
+                            <p class="text-muted mb-1">{{ user.email }}</p>
+                            <small class="text-muted">Member since {{ user.date_joined|date:"F Y" }}</small>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Information -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label text-muted small">First Name</label>
+                                    <p class="mb-0">{{ user.first_name|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label text-muted small">Last Name</label>
+                                    <p class="mb-0">{{ user.last_name|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label text-muted small">Username</label>
+                                    <p class="mb-0">{{ user.username }}</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label text-muted small">Email</label>
+                                    <p class="mb-0">{{ user.email }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Date of Birth</label>
+                                    <p class="mb-0">
+                                        {% if user.profile.date_of_birth %}
+                                            {{ user.profile.date_of_birth|date:"F d, Y" }}
+                                        {% else %}
+                                            Not provided
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>Contact Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Phone Number</label>
+                                    <p class="mb-0">{{ user.profile.phone_number|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Address</label>
+                                    <p class="mb-0">{{ user.profile.address|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label text-muted small">City</label>
+                                    <p class="mb-0">{{ user.profile.city|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label text-muted small">Postal Code</label>
+                                    <p class="mb-0">{{ user.profile.postal_code|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Country</label>
+                                    <p class="mb-0">{{ user.profile.country|default:"Not provided" }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
+            <!-- Quick Actions -->
             <div class="card mt-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Quick Actions</h5>
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <a href="{% url 'cart:view' %}" class="btn btn-outline-primary w-100 mb-2">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{% url 'cart:view' %}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-shopping-cart me-2"></i>View Cart
+                                {% if cart_count > 0 %}
+                                    <span class="badge bg-danger ms-1">{{ cart_count }}</span>
+                                {% endif %}
                             </a>
                         </div>
-                        <div class="col-md-4">
-                            <a href="{% url 'wishlist:view' %}" class="btn btn-outline-primary w-100 mb-2">
+                        <div class="col-md-3">
+                            <a href="{% url 'wishlist:view' %}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-heart me-2"></i>View Wishlist
+                                {% if wishlist_count > 0 %}
+                                    <span class="badge bg-danger ms-1">{{ wishlist_count }}</span>
+                                {% endif %}
                             </a>
                         </div>
-                        <div class="col-md-4">
-                            <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary w-100 mb-2">
+                        <div class="col-md-3">
+                            <a href="{% url 'dashboard:user' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-shopping-bag me-2"></i>Shop Now
                             </a>
                         </div>

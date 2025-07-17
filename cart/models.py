@@ -4,6 +4,8 @@ from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from store.models import Product
 
+#Cart and Cart Items models
+
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

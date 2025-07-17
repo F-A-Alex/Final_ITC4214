@@ -1,11 +1,7 @@
+
 $(document).ready(function() {
-    // Auto-submit quantity changes after a delay
-    let quantityTimeout;
-    $('.quantity-input').on('input', function() {
-        clearTimeout(quantityTimeout);
-        const form = $(this).closest('form');
-        quantityTimeout = setTimeout(function() {
-            form.submit();
-        }, 1000);
+    // Auto-submit quantity changes on change (removed timeout for immediate response)
+    $('.quantity-input').on('change', function() {
+        $(this).closest('form').submit();
     });
 });

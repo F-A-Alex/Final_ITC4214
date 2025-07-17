@@ -4,13 +4,17 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
 from django.db import transaction
+
 from .models import Cart, CartItem
 from store.models import Product, Order, OrderItem
+from .utils import get_cart_recommendations
 
+
+#Add to cart 
 @login_required
 def add_to_cart(request, product_id):
     try:
-        product_id = int(product_id)
+        product_id = int(product_id) #Validate id
         product = get_object_or_404(Product, id=product_id, is_active=True)
         cart, created = Cart.objects.get_or_create(user=request.user)
         
@@ -21,6 +25,7 @@ def add_to_cart(request, product_id):
         )
         
         if not created:
+            #only add if item is in stock
             if cart_item.quantity < product.stock_quantity:
                 cart_item.quantity += 1
                 cart_item.save()
@@ -40,22 +45,39 @@ def add_to_cart(request, product_id):
         messages.error(request, 'Unable to add item to cart.')
         return redirect('store:product_list')
 
+
+#Display cart and recommendations
 @login_required
 def cart_view(request):
     try:
         cart, created = Cart.objects.get_or_create(user=request.user)
-        return render(request, 'cart/cart.html', {'cart': cart})
+        
+        # Get recommendations based on cart items from utils.py
+        recommendations = get_cart_recommendations(request.user, limit=4)
+        
+        return render(request, 'cart/cart.html', {
+            'cart': cart,
+            'recommendations': recommendations
+        })
+    #If error show empty cart and no recommendations
     except Exception:
-        return render(request, 'cart/cart.html', {'cart': None})
+        return render(request, 'cart/cart.html', {
+            'cart': None,
+            'recommendations': []
+        })
 
+
+# Update the quantity of a specific cart item (POST only)
 @login_required
 @require_POST
 def update_cart_item(request, item_id):
     try:
         item_id = int(item_id)
         cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+        
         quantity = int(request.POST.get('quantity', 1))
         
+        # Check quantity is within stock limits
         if 1 <= quantity <= cart_item.product.stock_quantity:
             cart_item.quantity = quantity
             cart_item.save()
@@ -67,13 +89,16 @@ def update_cart_item(request, item_id):
     except Exception:
         messages.error(request, 'Unable to update cart.')
     
-    return redirect('cart:view')
+    return redirect(request.META.get('HTTP_REFERER', 'cart:view'))
 
+
+# Remove an item
 @login_required
 def remove_from_cart(request, item_id):
     try:
         item_id = int(item_id)
         cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+        
         product_name = cart_item.product.name
         cart_item.delete()
         messages.success(request, f'{product_name} removed from cart.')
@@ -82,17 +107,21 @@ def remove_from_cart(request, item_id):
     except Exception:
         messages.error(request, 'Unable to remove item.')
     
-    return redirect('cart:view')
+    return redirect(request.META.get('HTTP_REFERER', 'cart:view'))
 
+
+# Checkout view to finalize the order
 @login_required
 def checkout(request):
     try:
         cart = get_object_or_404(Cart, user=request.user)
+
+        #if cart empty show error
         if not cart.items.exists():
             messages.error(request, 'Your cart is empty.')
             return redirect('cart:view')
         
-        # Check stock availability
+        # Check stock availability again just to be extra sure
         for item in cart.items.all():
             if item.quantity > item.product.stock_quantity:
                 messages.error(request, f'Sorry, only {item.product.stock_quantity} of {item.product.name} available.')
@@ -115,7 +144,7 @@ def checkout(request):
                     
                     # Create order items and update stock
                     for item in cart.items.all():
-                        # Double-check stock with select_for_update
+                        # Double-check stock with select_for_update -- race condition protection
                         product = Product.objects.select_for_update().get(id=item.product.id)
                         if item.quantity > product.stock_quantity:
                             raise ValidationError(f'Insufficient stock for {product.name}')
@@ -127,11 +156,11 @@ def checkout(request):
                             price=product.price
                         )
                         
-                        # Update stock
+                        # Update stock -deduct quantity
                         product.stock_quantity -= item.quantity
                         product.save()
                     
-                    # Clear cart
+                    # Clear cart after transaction over
                     cart.items.all().delete()
                     
                     messages.success(request, f'Order {order.order_number} placed successfully!')
@@ -149,6 +178,8 @@ def checkout(request):
         messages.error(request, 'Unable to access checkout.')
         return redirect('cart:view')
 
+
+# Display confirmation page after successful order
 @login_required
 def order_confirmed(request, order_number):
     try:

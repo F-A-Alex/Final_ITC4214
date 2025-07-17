@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Sum
-from store.models import Product, Order
+from store.models import  Order
 from cart.models import Cart
 from wishlist.models import Wishlist
 
+
+# Get user statistics for dashboard - orders, cart and wishlist
 @login_required
 def user_dashboard(request):
     try:
-        # Get user statistics
+        
         user_orders = Order.objects.filter(user=request.user)
         recent_orders = user_orders[:5]
         active_orders = user_orders.exclude(status__in=['delivered', 'cancelled']).count()

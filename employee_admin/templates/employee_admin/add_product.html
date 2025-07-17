@@ -19,22 +19,30 @@
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Product Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.name.id_for_label }}" class="form-label">Product Name *</label>
-                                    {{ form.name }}
-                                    {% if form.name.errors %}
-                                        <div class="text-danger small">{{ form.name.errors.0 }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
                                     {{ form.category }}
                                     {% if form.category.errors %}
                                         <div class="text-danger small">{{ form.category.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.subcategory.id_for_label }}" class="form-label">Subcategory *</label>
+                                    {{ form.subcategory }}
+                                    {% if form.subcategory.errors %}
+                                        <div class="text-danger small">{{ form.subcategory.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                             </div>

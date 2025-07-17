@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
 from .models import Wishlist
 from store.models import Product
 
+
+#Add to wishlist/Remove only if logged in
 @login_required
 def add_to_wishlist(request, product_id):
     try:
@@ -12,6 +13,7 @@ def add_to_wishlist(request, product_id):
         product = get_object_or_404(Product, id=product_id, is_active=True)
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         
+        #if already in wishlist then remove else add
         if product in wishlist.products.all():
             wishlist.products.remove(product)
             messages.info(request, f'{product.name} removed from wishlist.')
@@ -32,6 +34,8 @@ def add_to_wishlist(request, product_id):
         messages.error(request, 'Unable to update wishlist.')
         return redirect('store:product_list')
 
+
+#Render wishlist page and populate if exists
 @login_required
 def wishlist_view(request):
     try:

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - Indigo{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="py-5 text-center text-white hero-section">
+    <div class="container">
+        <h1 class="display-4 fw-bold">About Indigo</h1>
+        <p class="lead mt-3">
+            A collective of passionate artisans creating handmade pottery, wood decorations, and jewelry with love and tradition.
+        </p>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="container py-5">
+    <div class="row align-items-center text-justify">
+        <div class="col-md-6 px-4">
+            <h2 class="mb-4">Who We Are</h2>
+            <p>
+                The brain child of Addy Heart, Indigo is a small ensemble of artisans dedicated to preserving the beauty of handmade crafts.
+                From earthy pottery to intricate wood decorations and delicate earrings and necklaces,
+                each piece tells a story rooted in tradition and creativity.
+            </p>
+            <p>
+                Based in our cozy workshop, we blend timeless techniques with modern design, offering you pieces that are both personal and unique.
+            </p>
+        </div>
+        <div class="col-md-6">
+            <img src="/media/static/about.jpg" class="img-fluid rounded" alt="Crafts in progress">
+        </div>
+    </div>
+</section>
+
+    <!-- Contact Section -->
+    <div class="bg-light rounded p-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="text-center mb-4" >Come Visit Us</h2>
+                <p class="text-center mb-4" >
+                    Our studio is open by appointment most weekends. We love showing people how things are made, 
+                    and there's usually coffee brewing.
+                </p>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <h5>Studio Address</h5>
+                            <p class="mb-1">142 Old Mill Road</p>
+                            <p class="mb-1">Millbrook, Vermont 05641</p>
+                            <p class="text-muted small">
+                                (Look for the red barn with the crooked weathervane)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <h5>Get in Touch</h5>
+                            <p class="mb-1">addy@indigo.com</p>
+                            <p class="mb-1">(802) 555-0147</p>
+                            <p class="text-muted small">
+                                Handling all customer inquiries
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p>
+                        <strong>Studio Hours:</strong> Saturdays 10am-4pm, Sundays 12pm-5pm, or by appointment<br>
+                        <em>Call ahead in winter - sometimes we get snowed in!</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Note -->
+    <div class="text-center mt-5">
+        <p class="lead">
+            Thank you for supporting handmade. Every purchase helps keep this little dream alive.
+        </p>
+        <p>
+            - Addy
+        </p>
+    </div>
+</div>
+{% endblock %}

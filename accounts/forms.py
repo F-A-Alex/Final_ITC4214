@@ -65,24 +65,29 @@ class ProfileForm(forms.ModelForm):
         widgets = {
             'phone_number': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '+1234567890 or 1234567890'
+                'placeholder': '+1234567890 or 1234567890',
+                'required': False  
             }),
             'address': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Enter your full address'
+                'placeholder': 'Enter your full address',
+                'required': False  
             }),
             'city': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter your city'
+                'placeholder': 'Enter your city',
+                'required': False  
             }),
             'postal_code': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '12345 or A1B 2C3'
+                'placeholder': '12345 or A1B 2C3',
+                'required': False 
             }),
             'country': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter your country'
+                'placeholder': 'Enter your country',
+                'required': False 
             }),
             'date_of_birth': forms.DateInput(attrs={
                 'type': 'date',
@@ -100,6 +105,32 @@ class ProfileForm(forms.ModelForm):
         self.fields['postal_code'].help_text = "Format: 12345 or A1B 2C3"
         self.fields['address'].help_text = "Maximum 500 characters"
     
+
+    def __init__(self, *args, **kwargs):
+        # Check if this is being used for checkout
+        self.for_checkout = kwargs.pop('for_checkout', False)
+        super().__init__(*args, **kwargs)
+        
+        # Set max date to today cant have birthday in future
+        self.fields['date_of_birth'].widget.attrs['max'] = date.today().isoformat()
+
+        # Add help text to some fields
+        self.fields['phone_number'].help_text = "Format: +1234567890 or 1234567890"
+        self.fields['postal_code'].help_text = "Format: 12345 or A1B 2C3"
+        self.fields['address'].help_text = "Maximum 500 characters"
+        
+        # Since reusing the same form and model - if used for checkout, make fields required 
+        if self.for_checkout:
+            self.fields['phone_number'].required = True
+            self.fields['address'].required = True
+            self.fields['city'].required = True
+            self.fields['postal_code'].required = True
+            self.fields['country'].required = True
+            self.fields['phone_number'].widget.attrs['required'] = True
+            self.fields['address'].widget.attrs['required'] = True
+            self.fields['city'].widget.attrs['required'] = True
+            self.fields['postal_code'].widget.attrs['required'] = True
+            self.fields['country'].widget.attrs['required'] = True
 
     #Some extra validation checks and restrictions
     # Phone field with relevant error messages

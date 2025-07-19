@@ -94,6 +94,16 @@
                             <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
                         </ul>
                     </li>
+                    
+                    <!-- Search Form - Mobile only (for logged-in users) -->
+                    <li class="nav-item d-lg-none">
+                        <form class="d-flex px-3 py-2" method="GET" action="{% url 'store:product_list' %}" id="mobileSearchFormLoggedIn">
+                            <input class="form-control me-2" type="search" name="search" placeholder="Search products..." value="{{ search_query }}" maxlength="100">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </li>
                 {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
@@ -102,7 +112,7 @@
                         <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
                     </li>
                     
-                    <!-- Search Form - Mobile only (after register) -->
+                    <!-- Search Form - Mobile only (for non-logged-in users) -->
                     <li class="nav-item d-lg-none">
                         <form class="d-flex px-3 py-2" method="GET" action="{% url 'store:product_list' %}" id="mobileSearchForm">
                             <input class="form-control me-2" type="search" name="search" placeholder="Search products..." value="{{ search_query }}" maxlength="100">

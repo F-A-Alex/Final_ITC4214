@@ -8,6 +8,7 @@ from django.db import transaction
 from .models import Cart, CartItem
 from store.models import Product, Order, OrderItem
 from .utils import get_cart_recommendations
+from accounts.forms import ProfileForm
 
 
 #Add to cart 
@@ -67,7 +68,7 @@ def cart_view(request):
         })
 
 
-# Update the quantity of a specific cart item (POST only)
+# Update the quantity of a specific cart item 
 @login_required
 @require_POST
 def update_cart_item(request, item_id):
@@ -128,13 +129,38 @@ def checkout(request):
                 return redirect('cart:view')
         
         if request.method == 'POST':
-            shipping_address = request.POST.get('shipping_address', '').strip()
-            if not shipping_address:
-                messages.error(request, 'Shipping address is required.')
-                return render(request, 'cart/checkout.html', {'cart': cart})
+            # Get form data
+            profile_form = ProfileForm(request.POST, instance=request.user.profile, for_checkout=True)
+            update_profile = request.POST.get('update_profile') == 'on'
+            
+            # Validate profile form (required fields for checkout)
+            if not profile_form.is_valid():
+                messages.error(request, 'Please fill in all required contact and address information.')
+                return render(request, 'cart/checkout.html', {
+                    'cart': cart,
+                    'profile_form': profile_form
+                })
             
             try:
                 with transaction.atomic():
+                    # Create shipping address from profile form data
+                    form_data = profile_form.cleaned_data
+                    address_parts = []
+                    if form_data.get('address'):
+                        address_parts.append(form_data['address'])
+                    if form_data.get('city'):
+                        address_parts.append(form_data['city'])
+                    if form_data.get('postal_code'):
+                        address_parts.append(form_data['postal_code'])
+                    if form_data.get('country'):
+                        address_parts.append(form_data['country'])
+                    
+                    shipping_address = ', '.join(address_parts)
+                    
+                    # Update profile if requested and form is valid
+                    if update_profile and profile_form.is_valid():
+                        profile_form.save()
+                    
                     # Create order
                     order = Order.objects.create(
                         user=request.user,
@@ -144,7 +170,7 @@ def checkout(request):
                     
                     # Create order items and update stock
                     for item in cart.items.all():
-                        # Double-check stock with select_for_update -- race condition protection
+                        # Double-check stock with select_for_update in case of race condition 
                         product = Product.objects.select_for_update().get(id=item.product.id)
                         if item.quantity > product.stock_quantity:
                             raise ValidationError(f'Insufficient stock for {product.name}')
@@ -173,7 +199,13 @@ def checkout(request):
                 messages.error(request, 'Unable to process order. Please try again.')
                 return render(request, 'cart/checkout.html', {'cart': cart})
         
-        return render(request, 'cart/checkout.html', {'cart': cart})
+        # GET request - prepare form with user's current profile data
+        profile_form = ProfileForm(instance=request.user.profile, for_checkout=True)
+        
+        return render(request, 'cart/checkout.html', {
+            'cart': cart,
+            'profile_form': profile_form
+        })
     except Exception:
         messages.error(request, 'Unable to access checkout.')
         return redirect('cart:view')

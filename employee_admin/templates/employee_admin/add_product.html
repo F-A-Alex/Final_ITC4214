@@ -32,6 +32,7 @@
                                 <div class="mb-3">
                                     <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
                                     {{ form.category }}
+                                    <div class="form-text">Select a category first</div>
                                     {% if form.category.errors %}
                                         <div class="text-danger small">{{ form.category.errors.0 }}</div>
                                     {% endif %}
@@ -40,7 +41,10 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="{{ form.subcategory.id_for_label }}" class="form-label">Subcategory *</label>
-                                    {{ form.subcategory }}
+                                    <select name="subcategory" class="form-select" id="id_subcategory" disabled>
+                                        <option value="">---------</option>
+                                    </select>
+                                    <div class="form-text">Choose a category first to see available subcategories</div>
                                     {% if form.subcategory.errors %}
                                         <div class="text-danger small">{{ form.subcategory.errors.0 }}</div>
                                     {% endif %}
@@ -117,4 +121,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

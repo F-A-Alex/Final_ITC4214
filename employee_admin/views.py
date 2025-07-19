@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponseForbidden
 from django.template import TemplateDoesNotExist
 from django.db.models import Q
+from django.http import JsonResponse
 import os
 from store.models import Product, Category, Subcategory, Order
 from .forms import ProductForm, OrderForm
@@ -152,8 +153,11 @@ def add_product(request):
                 product.save()
                 messages.success(request, f'Product "{product.name}" has been added successfully!')
                 return redirect('employee_admin:products')
-            except Exception:
-                messages.error(request, 'Unable to add product. Please try again.')
+            except Exception as e:
+                messages.error(request, f'Unable to add product: {str(e)}')
+        else:
+            # Form has validation errors
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = ProductForm()
     
@@ -174,8 +178,11 @@ def edit_product(request, pk):
                     form.save()
                     messages.success(request, f'Product "{product.name}" has been updated successfully!')
                     return redirect('employee_admin:products')
-                except Exception:
-                    messages.error(request, 'Unable to update product. Please try again.')
+                except Exception as e:
+                    messages.error(request, f'Unable to update product: {str(e)}')
+            else:
+                # Form has validation errors
+                messages.error(request, 'Please correct the errors below.')
         else:
             form = ProductForm(instance=product)
         
@@ -204,8 +211,8 @@ def delete_product(request, pk):
         if request.method == 'POST':
             try:
                 product_name = product.name
-                # Delete the image file if product has one
-                if product.image:
+                # Delete the image file if product has one and it isnt default
+                if product.image and os.path.basename(product.image.name) != 'default.jpg':
                     image_path = product.image.path
                     if os.path.exists(image_path):
                         os.remove(image_path)
@@ -247,4 +254,20 @@ def edit_order(request, pk):
         })
     except (ValueError, TypeError):
         messages.error(request, 'Invalid order ID.')
-        return redirect('employee_admin:orders')
+
+
+#AJAX view to get subcategories for the selected category only - to prevent database issues
+@staff_required
+def get_subcategories(request):
+    try:
+        category_id = request.GET.get('category_id')
+        if category_id:
+            category_id = int(category_id)
+            subcategories = Subcategory.objects.filter(category_id=category_id).values('id', 'name')
+            subcategory_list = [{'id': sub['id'], 'name': dict(Subcategory.SUBCATEGORY_CHOICES)[sub['name']]} for sub in subcategories]
+            return JsonResponse({'subcategories': subcategory_list})
+        return JsonResponse({'subcategories': []})
+    except (ValueError, TypeError):
+        return JsonResponse({'subcategories': []})
+    except Exception:
+        return JsonResponse({'subcategories': []})

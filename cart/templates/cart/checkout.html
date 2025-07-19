@@ -11,16 +11,118 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Shipping Information</h5>
+                    <h5 class="mb-0">Shipping & Contact Information</h5>
                 </div>
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="shipping_address" class="form-label">Shipping Address *</label>
-                            <textarea class="form-control" id="shipping_address" name="shipping_address" rows="4" required 
-                                placeholder="Enter your complete shipping address...">{% if user.profile.address %}{{ user.profile.address }}{% if user.profile.city %}, {{ user.profile.city }}{% endif %}{% if user.profile.postal_code %} {{ user.profile.postal_code }}{% endif %}{% if user.profile.country %}, {{ user.profile.country }}{% endif %}{% endif %}</textarea>
+                        
+                        <!-- Contact Information Section -->
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3">
+                                <i class="fas fa-phone me-2"></i>Contact Information
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ profile_form.phone_number.id_for_label }}" class="form-label">
+                                            Phone Number *
+                                        </label>
+                                        {{ profile_form.phone_number }}
+                                        {% if profile_form.phone_number.help_text %}
+                                            <div class="form-text">{{ profile_form.phone_number.help_text }}</div>
+                                        {% endif %}
+                                        {% if profile_form.phone_number.errors %}
+                                            <div class="text-danger small">{{ profile_form.phone_number.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                        <div class="form-text">Your account email will be used for order updates</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Address Information Section -->
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i>Address Information
+                            </h6>
+                            
+                            <div class="mb-3">
+                                <label for="{{ profile_form.address.id_for_label }}" class="form-label">
+                                    Street Address *
+                                </label>
+                                {{ profile_form.address }}
+                                {% if profile_form.address.help_text %}
+                                    <div class="form-text">{{ profile_form.address.help_text }}</div>
+                                {% endif %}
+                                {% if profile_form.address.errors %}
+                                    <div class="text-danger small">{{ profile_form.address.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ profile_form.city.id_for_label }}" class="form-label">
+                                            City *
+                                        </label>
+                                        {{ profile_form.city }}
+                                        {% if profile_form.city.errors %}
+                                            <div class="text-danger small">{{ profile_form.city.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ profile_form.postal_code.id_for_label }}" class="form-label">
+                                            Postal Code *
+                                        </label>
+                                        {{ profile_form.postal_code }}
+                                        {% if profile_form.postal_code.help_text %}
+                                            <div class="form-text">{{ profile_form.postal_code.help_text }}</div>
+                                        {% endif %}
+                                        {% if profile_form.postal_code.errors %}
+                                            <div class="text-danger small">{{ profile_form.postal_code.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ profile_form.country.id_for_label }}" class="form-label">
+                                    Country *
+                                </label>
+                                {{ profile_form.country }}
+                                {% if profile_form.country.errors %}
+                                    <div class="text-danger small">{{ profile_form.country.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Profile Update Option -->
+                        <div class="mb-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="update_profile" name="update_profile" checked>
+                                        <label class="form-check-label" for="update_profile">
+                                            <strong>Save this information to my profile</strong>
+                                        </label>
+                                        <div class="form-text">
+                                            Save this information to your profile for faster checkout next time.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-success btn-lg">
                             <i class="fas fa-credit-card me-2"></i>Place Order
                         </button>
@@ -65,6 +167,20 @@
                         <i class="fas fa-info-circle me-2"></i>
                         <small>Your order will be processed within 1-2 business days.</small>
                     </div>
+                </div>
+            </div>
+
+            <!-- Customer Information Display -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Customer Information</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Name:</strong> {{ user.get_full_name|default:user.username }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                    <small class="text-muted">
+                        Order confirmation will be sent to this email address.
+                    </small>
                 </div>
             </div>
         </div>

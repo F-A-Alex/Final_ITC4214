@@ -26,15 +26,28 @@ class ProductForm(forms.ModelForm):
         self.fields['is_active'].widget.attrs.update({'class': 'form-check-input'})
         self.fields['featured'].widget.attrs.update({'class': 'form-check-input'})
         
-        # Filter subcategories based on category if editing existing product else show all
-        if self.instance and self.instance.pk and self.instance.category:
+        # Handle subcategory queryset based on form data or instance
+        if self.data and self.data.get('category'):
+            # Form submission with category selected - show subcategories for selected category
+            try:
+                category_id = int(self.data.get('category'))
+                self.fields['subcategory'].queryset = Subcategory.objects.filter(category_id=category_id)
+            except (ValueError, TypeError):
+                self.fields['subcategory'].queryset = Subcategory.objects.none()
+        elif self.instance and self.instance.pk and self.instance.category:
+            # Editing existing product - show subcategories for current category
             self.fields['subcategory'].queryset = Subcategory.objects.filter(category=self.instance.category)
         else:
-            self.fields['subcategory'].queryset = Subcategory.objects.all()
+            # New product form - start with empty subcategories
+            self.fields['subcategory'].queryset = Subcategory.objects.none()
+        
+        # Add data attributes for JavaScript - since using Ajax here
+        self.fields['category'].widget.attrs.update({'data-subcategory-url': '/employee-admin/get-subcategories/'})
     
     def clean_image(self):
         image = self.cleaned_data.get('image')
-        #check for file size or default to 0 so there is no error
+        
+        # For new products, image is not required but if provided, validate it
         if image:
             if hasattr(image, 'size'):
                 file_size = image.size
@@ -54,6 +67,19 @@ class ProductForm(forms.ModelForm):
                     raise ValidationError("Invalid image format. Please use JPG, PNG, GIF, or WebP.")
         
         return image
+    
+
+    #Ensure the appropriate subcategory is selected according to categories (so we dont have database issue)
+    def clean(self):
+        cleaned_data = super().clean()
+        category = cleaned_data.get('category')
+        subcategory = cleaned_data.get('subcategory')
+        
+        if category and subcategory:
+            if subcategory.category != category:
+                raise ValidationError("The selected subcategory does not belong to the selected category.")
+        
+        return cleaned_data
 
 # Form for orders
 class OrderForm(forms.ModelForm):

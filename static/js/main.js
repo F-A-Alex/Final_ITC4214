@@ -1,4 +1,10 @@
 $(document).ready(function() {
+
+
+
+
+
+
     // Product card click handling
     $('.product-card').on('click', function(e) {
         // Don't navigate if clicking on buttons
@@ -24,4 +30,10 @@ $(document).ready(function() {
     }).on('mouseleave', function() {
         $(this).css('transform', 'scale(1)');
     });
+
+
+
+
+
+    
 });

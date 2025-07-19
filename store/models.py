@@ -5,6 +5,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from PIL import Image
 import uuid
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 #Get products similar to the given product 
@@ -80,7 +82,7 @@ class Product(models.Model):
     )
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
-    image = models.ImageField(upload_to='products/', default='products/default.jpg') #upload to media directory  
+    image = models.ImageField(upload_to='products/', default='static/default.jpg') #upload to media directory  
     stock_quantity = models.PositiveIntegerField(
         default=0,
         validators=[MaxValueValidator(9999)]
@@ -185,3 +187,20 @@ class OrderItem(models.Model):
     @property
     def total_price(self):
         return self.quantity * self.price
+    
+
+#Handle stock restoration if order is cancelled
+@receiver(pre_save, sender=Order)
+def handle_order_status_change(sender, instance, **kwargs):
+    if instance.pk:  # Only for existing orders
+        try:
+            old_order = Order.objects.get(pk=instance.pk)
+            # If order is being cancelled and wasn't cancelled before
+            if instance.status == 'cancelled' and old_order.status != 'cancelled':
+                # Restore stock for all items in the order
+                for order_item in instance.items.all():
+                    product = order_item.product
+                    product.stock_quantity += order_item.quantity
+                    product.save()
+        except Order.DoesNotExist:
+            pass  # New order, no action needed

@@ -19,9 +19,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ob(t3a!fegkt2no4j)-h4b91=!un0@qn5#z1z6t@bq$k7l7v%l'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -127,6 +124,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+#For developmnt uncomment this:
+#STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
+#For production uncomment this:
 STATIC_ROOT = BASE_DIR / 'static'
 
 # Media files
